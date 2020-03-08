@@ -2,7 +2,6 @@
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-import argparse
 
 from covid_data import get_regional_covid_data
 
@@ -32,7 +31,4 @@ app.layout = html.Div(children=[
 ])
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Start covid-19 server')
-    parser.add_argument('--debug', dest='debug', action='store_true', help='Start in debug mode')
-    args = parser.parse_args()
-    app.run_server(debug=args.debug)
+    app.run_server(debug=True)
