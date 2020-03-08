@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import argparse
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
@@ -40,4 +41,7 @@ app.layout = html.Div(children=[
 ])
 
 if __name__ == '__main__':
-    app.run_server(debug=True, port=8080)
+    parser = argparse.ArgumentParser(description='Run debug server')
+    parser.add_argument('--port', dest='port', type=int, default=8080, help='HTTP server port')
+    args = parser.parse_args()
+    app.run_server(debug=True, port=args.port)
