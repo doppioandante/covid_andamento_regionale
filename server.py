@@ -7,7 +7,10 @@ from covid_data import get_regional_covid_data
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+app = dash.Dash(
+    external_stylesheets=external_stylesheets,
+    url_base_pathname='/covid-19/'
+)
 
 covid_data = get_regional_covid_data()
 
@@ -31,4 +34,4 @@ app.layout = html.Div(children=[
 ])
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=True, port=8080)
