@@ -1,3 +1,8 @@
+# Total COVID-19 positives in Italy
+
+## Live url
+[https://enrico.acqua.team/covid-19/](https://enrico.acqua.team/covid-19/)
+
 ## how to run in development mode
 ```
 ./pull-covid-data.sh

@@ -14,6 +14,7 @@ app = dash.Dash(
 
 covid_data = get_regional_covid_data()
 
+app.title = 'Andamento regionali contagi'
 app.layout = html.Div(children=[
     html.H1(children='Andamento regionale COVID-19'),
 
