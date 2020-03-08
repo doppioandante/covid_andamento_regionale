@@ -5,4 +5,5 @@ if [ ! -d "COVID-19" ]; then
 fi
 
 cd COVID-19 && git pull origin master
+cd ..
 date -Is > update_timestamp.txt
