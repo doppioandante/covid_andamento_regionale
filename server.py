@@ -17,9 +17,20 @@ app = dash.Dash(
 
 covid_data = get_regional_covid_data()
 
-app.title = 'Andamento regionali contagi'
+app.title = 'Andamento territoriale contagi'
 app.layout = html.Div(children=[
-    html.H1(children='Andamento regionale COVID-19'),
+    html.H1(children='Andamento territoriale COVID-19'),
+
+    html.Div([
+        '''
+        Visualizzazione degli andamenti territoriali del COVID-19.
+        I dati sono aggiornati automaticamente dalla
+        ''',
+        html.A('fonte ufficiale della protezione civile', href='https://github.com/pcm-dpc/COVID-19'),
+        '.', html.Br(),
+        'Il codice è open source sotto licenza MIT e disponibile su ',
+        html.A('github', href='https://github.com/doppioandante/covid_andamento_regionale'),
+    ]),
 
     dcc.Graph(
         id='veneto-graph',
