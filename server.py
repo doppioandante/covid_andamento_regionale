@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import argparse
+from datetime import datetime
+from pathlib import Path
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
@@ -16,6 +18,12 @@ app = dash.Dash(
 )
 
 covid_data = get_regional_covid_data()
+last_update = ''
+try:
+    iso_timestamp = Path('update_timestamp.txt').read_text().strip()
+    last_update = datetime.fromisoformat(iso_timestamp)
+except:
+    pass
 
 app.title = 'Andamento territoriale contagi'
 app.layout = html.Div(children=[
@@ -31,6 +39,10 @@ app.layout = html.Div(children=[
         'Il codice è open source sotto licenza MIT e disponibile su ',
         html.A('github', href='https://github.com/doppioandante/covid_andamento_regionale'),
     ]),
+
+    html.Div(f'''
+        Ultimo aggiornamento: {last_update}
+    '''),
 
     dcc.Graph(
         id='veneto-graph',
