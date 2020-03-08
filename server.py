@@ -5,10 +5,12 @@ import dash_html_components as html
 
 from covid_data import get_regional_covid_data
 
+external_scripts = ["https://cdn.plot.ly/plotly-locale-it-latest.js"]
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(
     external_stylesheets=external_stylesheets,
+    external_scripts=external_scripts,
     url_base_pathname='/covid-19/'
 )
 
@@ -30,7 +32,10 @@ app.layout = html.Div(children=[
                 'title': 'Totale attualmente positivi',
                 'showlegend': True
             }
-        }
+        },
+        config=dict(
+            locale='it'
+        )
     )
 ])
 
