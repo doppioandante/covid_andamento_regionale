@@ -5,7 +5,9 @@ from pathlib import Path
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+from dash.dependencies import Input, Output
 
+import covid_data
 from covid_data import get_regional_covid_data
 
 external_scripts = ["https://cdn.plot.ly/plotly-locale-it-latest.js"]
@@ -17,7 +19,7 @@ app = dash.Dash(
     url_base_pathname='/covid-19/'
 )
 
-covid_data = get_regional_covid_data()
+by_region = get_regional_covid_data()
 last_update = ''
 try:
     iso_timestamp = Path('update_timestamp.txt').read_text().strip()
@@ -44,24 +46,70 @@ app.layout = html.Div(children=[
         Ultimo aggiornamento: {last_update}
     '''),
 
+    dcc.RadioItems(
+        id='plot-type',
+        options=[{'label': i, 'value': i} for i in ['Confronto Regioni', 'Dettaglio Regione']], #'Confronto Province', 'Per Provincia']],
+        value='Confronto Regioni',
+        labelStyle={'display': 'inline-block'}
+    ),
+    dcc.Dropdown(
+        id='plot-variable'
+    ),
     dcc.Graph(
-        id='veneto-graph',
-        figure={
-            'data': [{
-               'x': covid_data[nome_regione].index,
-               'y': covid_data[nome_regione].to_list(),
-               'name': nome_regione
-            } for nome_regione in covid_data.columns],
-            'layout': {
-                'title': 'Totale attualmente positivi',
-                'showlegend': True
-            }
-        },
+        id='trend-plot',
         config=dict(
             locale='it'
         )
     )
 ])
+
+@app.callback(
+    Output('plot-variable', 'options'),
+    [Input('plot-type', 'value')])
+def set_dropdown_options(plot_type):
+    if plot_type == 'Confronto Regioni':
+        return [{'label': label, 'value': key} for key, label in covid_data.fields.items()]
+    elif plot_type == 'Dettaglio Regione':
+        return [{'label': r, 'value': r} for r in covid_data.regions]
+
+@app.callback(
+    Output('plot-variable', 'value'),
+    [Input('plot-variable', 'options')])
+def set_plot_variable(available_options):
+    return available_options[0]['value']
+
+@app.callback(
+    Output('trend-plot', 'figure'),
+    [Input('plot-type', 'value'),
+     Input('plot-variable', 'value')]
+)
+def update_graph(plot_type, plot_variable):
+    if plot_type == 'Confronto Regioni':
+        return {
+            'data': [{
+               'x': by_region[plot_variable][nome_regione].index,
+               'y': by_region[plot_variable][nome_regione].to_list(),
+               'name': nome_regione
+            } for nome_regione in covid_data.regions],
+            'layout': {
+                'title': covid_data.fields[plot_variable],
+                'showlegend': True
+            }
+        }
+    elif plot_type == 'Dettaglio Regione':
+        region = plot_variable
+        return {
+            'data': [{
+               'x': by_region[key][region].index,
+               'y': by_region[key][region].to_list(),
+               'name': covid_data.fields[key]
+            } for key in covid_data.fields.keys()],
+            'layout': {
+                'title': 'Trend Regione ' + region,
+                'showlegend': True
+            }
+        }
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Run debug server')
