@@ -2,10 +2,11 @@
 import argparse
 from datetime import datetime
 from pathlib import Path
+import numpy as np
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 
 import covid_data
 from covid_data import get_regional_covid_data
@@ -20,6 +21,7 @@ app = dash.Dash(
 )
 
 by_region = get_regional_covid_data()
+by_province = covid_data.get_data_by_province()
 last_update = ''
 try:
     iso_timestamp = Path('update_timestamp.txt').read_text().strip()
@@ -40,6 +42,7 @@ app.layout = html.Div(children=[
         '.', html.Br(),
         'Il codice è open source sotto licenza MIT e disponibile su ',
         html.A('github', href='https://github.com/doppioandante/covid_andamento_regionale'),
+        '.'
     ]),
 
     html.Div(f'''
@@ -48,7 +51,7 @@ app.layout = html.Div(children=[
 
     dcc.RadioItems(
         id='plot-type',
-        options=[{'label': i, 'value': i} for i in ['Confronto Regioni', 'Dettaglio Regione']], #'Confronto Province', 'Per Provincia']],
+        options=[{'label': i, 'value': i} for i in ['Confronto Regioni', 'Dettaglio Regione', 'Dettaglio Province per Regione']],
         value='Confronto Regioni',
         labelStyle={'display': 'inline-block'}
     ),
@@ -70,6 +73,8 @@ def set_dropdown_options(plot_type):
     if plot_type == 'Confronto Regioni':
         return [{'label': label, 'value': key} for key, label in covid_data.fields.items()]
     elif plot_type == 'Dettaglio Regione':
+        return [{'label': r, 'value': r} for r in np.insert(covid_data.regions, 0, 'Italia')]
+    elif plot_type == 'Dettaglio Province per Regione':
         return [{'label': r, 'value': r} for r in covid_data.regions]
 
 @app.callback(
@@ -102,10 +107,25 @@ def update_graph(plot_type, plot_variable):
             'data': [{
                'x': by_region[key][region].index,
                'y': by_region[key][region].to_list(),
-               'name': covid_data.fields[key]
+               'name': covid_data.fields[key],
+               'visible': 'legendonly' if key == 'tamponi' else 'true'
             } for key in covid_data.fields.keys()],
             'layout': {
-                'title': 'Trend Regione ' + region,
+                'title': 'Trend ' + region,
+                'showlegend': True
+            }
+        }
+    elif plot_type == 'Dettaglio Province per Regione':
+        region = plot_variable
+        key = list(covid_data.province_fields.keys())[0]
+        return {
+            'data': [{
+               'x': by_province[key][region][province_name].index,
+               'y': by_province[key][region][province_name].to_list(),
+               'name': province_name
+            } for province_name in covid_data.provinces[region]],
+            'layout': {
+                'title': 'Province - ' + region,
                 'showlegend': True
             }
         }
