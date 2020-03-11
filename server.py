@@ -7,7 +7,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
 
-import covid_data
+import covid_data_serialized as covid_data
 
 external_scripts = ["https://cdn.plot.ly/plotly-locale-it-latest.js"]
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']

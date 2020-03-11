@@ -7,3 +7,5 @@ fi
 cd COVID-19 && git pull origin master
 cd ..
 date -Is > update_timestamp.txt
+
+./venv/bin/python3 generate_time_series.py
