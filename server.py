@@ -2,14 +2,12 @@
 import argparse
 from datetime import datetime
 from pathlib import Path
-import numpy as np
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
 
 import covid_data
-from covid_data import get_regional_covid_data
 
 external_scripts = ["https://cdn.plot.ly/plotly-locale-it-latest.js"]
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -20,7 +18,7 @@ app = dash.Dash(
     url_base_pathname='/covid-19/'
 )
 
-by_region = get_regional_covid_data()
+by_region = covid_data.get_data_by_region()
 by_province = covid_data.get_data_by_province()
 last_update = ''
 try:
@@ -73,7 +71,7 @@ def set_dropdown_options(plot_type):
     if plot_type == 'Confronto Regioni':
         return [{'label': label, 'value': key} for key, label in covid_data.fields.items()]
     elif plot_type == 'Dettaglio Regione':
-        return [{'label': r, 'value': r} for r in np.insert(covid_data.regions, 0, 'Italia')]
+        return [{'label': r, 'value': r} for r in covid_data.extended_regions]
     elif plot_type == 'Dettaglio Province per Regione':
         return [{'label': r, 'value': r} for r in covid_data.regions]
 
@@ -94,8 +92,9 @@ def update_graph(plot_type, plot_variable):
             'data': [{
                'x': by_region[plot_variable][nome_regione].index,
                'y': by_region[plot_variable][nome_regione].to_list(),
-               'name': nome_regione
-            } for nome_regione in covid_data.regions],
+               'name': nome_regione,
+               'visible': 'legendonly' if nome_regione == 'Italia' else 'true'
+            } for nome_regione in covid_data.extended_regions],
             'layout': {
                 'title': covid_data.fields[plot_variable],
                 'showlegend': True
@@ -125,7 +124,7 @@ def update_graph(plot_type, plot_variable):
                'name': province_name
             } for province_name in covid_data.provinces[region]],
             'layout': {
-                'title': 'Province - ' + region,
+                'title': 'Casi totali - ' + region,
                 'showlegend': True
             }
         }

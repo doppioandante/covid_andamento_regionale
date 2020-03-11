@@ -1,6 +1,5 @@
 import pandas as pd
-from glob import glob
-import os
+import numpy as np
 
 REGIONI_DATA_PATH = 'COVID-19/dati-regioni/dpc-covid19-ita-regioni.csv'
 PROVINCE_DATA_PATH = 'COVID-19/dati-province/dpc-covid19-ita-province.csv'
@@ -20,6 +19,7 @@ fields = {
 }
 
 regions = df_regions['denominazione_regione'].unique()
+extended_regions = np.insert(regions, 0, 'Italia')
 
 # dict in the form {'Region': [list of provinces'])
 dff = pd.DataFrame(df_provinces, columns=['denominazione_regione', 'denominazione_provincia'])
@@ -32,8 +32,7 @@ province_fields = {
     'totale_casi': 'Casi totali'
 }
 
-
-def get_regional_covid_data():
+def get_data_by_region():
     global df_regions
     dff = df_regions.pivot(index='data',columns='denominazione_regione', values=fields.keys())
     sum_df = dff.sum(axis=1, level=0)
@@ -48,7 +47,3 @@ def get_data_by_province():
         values=province_fields.keys()
     )
     return dff
-
-if __name__ == '__main__':
-    df = get_data_by_province()
-    print(df)
