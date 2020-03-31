@@ -9,7 +9,7 @@ df_provinces = pd.read_csv(PROVINCE_DATA_PATH, parse_dates=['data'])
 
 fields = {
     'totale_casi': 'Casi totali',
-    'totale_attualmente_positivi': 'Attualmente positivi',
+    'totale_positivi': 'Attualmente positivi',
     'isolamento_domiciliare': 'Isolamento domiciliare',
     'totale_ospedalizzati': 'Positivi ospedalizzati',
     'terapia_intensiva': 'Pazienti in terapia intensiva',
